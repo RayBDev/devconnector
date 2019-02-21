@@ -15,6 +15,11 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// Remove Mongoose Deprecation Warnings
+// mongoose.set("useNewUrlParser", true);
+mongoose.set("useFindAndModify", false);
+mongoose.set("useCreateIndex", true);
+
 // DB Config
 const db = process.env.MONGODB_URI;
 
