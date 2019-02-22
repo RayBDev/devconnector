@@ -3,8 +3,10 @@ const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
 
 const User = require("../../../models/User");
+const Profile = require("../../../models/Profile");
 
 const userOneId = new ObjectID();
+const profileOneId = new ObjectID();
 const userTwoId = new ObjectID();
 const avatar = gravatar.url(this.email, {
   s: "200", //Size
@@ -29,6 +31,18 @@ const users = [
   }
 ];
 
+const profiles = [
+  {
+    _id: profileOneId,
+    user: userOneId,
+    handle: "RayB",
+    status: "Full Stack Developer",
+    skills: ["HTML", "CSS", "JavaScript", "React.js", "Node.js"],
+    company: "Tactic Apps",
+    website: "https://www.tacticapps.com"
+  }
+];
+
 const populateUsers = done => {
   User.deleteMany({})
     .then(() => {
@@ -49,4 +63,14 @@ const populateUsers = done => {
     .then(() => done());
 };
 
-module.exports = { users, populateUsers };
+const populateProfiles = done => {
+  Profile.deleteMany({})
+    .then(() => {
+      let userOneProfile = new Profile(profiles[0]).save();
+
+      return Promise.all([userOneProfile]);
+    })
+    .then(() => done());
+};
+
+module.exports = { users, populateUsers, profiles, populateProfiles };

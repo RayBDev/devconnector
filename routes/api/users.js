@@ -144,11 +144,12 @@ router.post("/forgetpw", (req, res) => {
     const payload = { _id: user._id }; // Create JWT Payload
 
     // Sign Token
-    const token =
-      "Bearer " + jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 600 });
+    const token = encodeURI(
+      "Bearer " + jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 600 })
+    );
 
     const subject = "Password reset link - example.com";
-    const message = `Please <a href="https://test.com/resetpw/${token}">click here</a> to reset your password`;
+    const message = `Please <a href="https://test.com/resetpw/?${token}">click here</a> to reset your password`;
 
     sendEmail(user.name, user.email, subject, message).catch(err =>
       res.status(400).json({ error: "Email service down" })
@@ -157,10 +158,10 @@ router.post("/forgetpw", (req, res) => {
   });
 });
 
-// @route   POST api/users/resetpw
+// @route   PATCH api/users/resetpw
 // @desc    Reset user password
 // @access  Public
-router.post(
+router.patch(
   "/resetpw",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
@@ -173,6 +174,7 @@ router.post(
 
     let password = req.body.password;
 
+    // Create promise to wait for password hash to resolve
     const encryptPassword = new Promise((resolve, reject) => {
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(password, salt, (err, hash) => {
@@ -182,6 +184,7 @@ router.post(
       });
     });
 
+    // Find and update user password after password is hashed
     encryptPassword.then(() => {
       User.findByIdAndUpdate(
         { _id: req.user._id },
