@@ -77,12 +77,21 @@ router.post(
 
     Profile.findOne({ user: req.user._id }).then(profile => {
       if (profile) {
-        // Update
-        Profile.findOneAndUpdate(
-          { user: req.user._id },
-          { $set: profileFields },
-          { new: true }
-        ).then(profile => res.json(profile));
+        // Check if handle exists
+        Profile.findOne({ handle: profileFields.handle }).then(profile => {
+          // Do not update if handle exists
+          if (profile) {
+            errors.handle = "That handle already exists";
+            return res.status(400).json(errors);
+          } else {
+            // Update if handle doesn't exist
+            Profile.findOneAndUpdate(
+              { user: req.user._id },
+              { $set: profileFields },
+              { new: true }
+            ).then(profile => res.json(profile));
+          }
+        });
       } else {
         // Create
 
@@ -90,7 +99,7 @@ router.post(
         Profile.findOne({ handle: profileFields.handle }).then(profile => {
           if (profile) {
             errors.handle = "That handle already exists";
-            res.status(400).jason(errors);
+            return res.status(400).json(errors);
           }
 
           // Save Profile

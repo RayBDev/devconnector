@@ -272,7 +272,7 @@ describe("TEST ALL PROFILE ROUTES", () => {
     it("should receive 404 if authorized user has no profile", done => {
       let token =
         "Bearer " +
-        jwt.sign({ _id: users[1]._id }, process.env.JWT_SECRET, {
+        jwt.sign({ _id: users[2]._id }, process.env.JWT_SECRET, {
           expiresIn: 600
         });
 
@@ -300,6 +300,131 @@ describe("TEST ALL PROFILE ROUTES", () => {
         .expect(res => {
           expect(res.body).toBeTruthy();
           expect(res.body.noprofile).toBeFalsy();
+        })
+        .end(done);
+    });
+  });
+
+  describe("POST /api/profile", () => {
+    it("should create new profile", done => {
+      let handle = "JohnD";
+      let status = "Trainer";
+      let skills = "HTML, CSS, JavaScript, PHP";
+      let company = "http://www.traversymedia.com";
+      let location = "USA";
+      let bio = "Coding developer and teacher";
+      let githubusername = "traversymedia";
+      let youtube = "http://www.youtube.com";
+      let linkedin = "http://www.linkedin.com";
+      let facebook = "http://www.facebook.com";
+      let instagram = "http://www.instagram.com";
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[2]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post("/api/profile")
+        .set("Authorization", token)
+        .send({
+          handle,
+          status,
+          skills,
+          company,
+          location,
+          bio,
+          githubusername,
+          youtube,
+          linkedin,
+          facebook,
+          instagram
+        })
+        .expect(200)
+        .expect(res => {
+          expect(res.body).toMatchObject({
+            handle,
+            status,
+            company,
+            location,
+            bio,
+            githubusername
+          });
+          expect(res.body.social).toMatchObject({
+            youtube,
+            linkedin,
+            facebook,
+            instagram
+          });
+          expect(res.body.skills).toMatchObject(
+            skills.split(",").map(skill => skill.trim())
+          );
+        })
+        .end(done);
+    });
+
+    it("should update a user's profile", done => {
+      let handle = "RayBDev";
+      let skills = "HTML, CSS, JavaScript, React.js, Node.js, Express.js";
+      let status = "Full Stack Web Developer";
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post("/api/profile")
+        .set("Authorization", token)
+        .send({ handle, skills, status })
+        .expect(200)
+        .expect(res => {
+          expect(res.body).toMatchObject({ handle, status });
+          expect(res.body.skills).toMatchObject(
+            skills.split(",").map(skill => skill.trim())
+          );
+        })
+        .end(done);
+    });
+
+    it("should not create profile if handle exists", done => {
+      let handle = profiles[0].handle;
+      let skills = "HTML, CSS, JavaScript, React.js, Node.js, Express.js";
+      let status = "Full Stack Web Developer";
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[2]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post("/api/profile")
+        .set("Authorization", token)
+        .send({ handle, skills, status })
+        .expect(400)
+        .expect(res => {
+          expect(res.body.handle).toBe("That handle already exists");
+        })
+        .end(done);
+    });
+
+    it("should not update profile if handle exists", done => {
+      let handle = profiles[1].handle;
+      let skills = "HTML, CSS, JavaScript, React.js, Node.js, Express.js";
+      let status = "Full Stack Web Developer";
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post("/api/profile")
+        .set("Authorization", token)
+        .send({ handle, skills, status })
+        .expect(400)
+        .expect(res => {
+          expect(res.body.handle).toBe("That handle already exists");
         })
         .end(done);
     });

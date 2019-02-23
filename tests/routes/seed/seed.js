@@ -6,8 +6,10 @@ const User = require("../../../models/User");
 const Profile = require("../../../models/Profile");
 
 const userOneId = new ObjectID();
-const profileOneId = new ObjectID();
 const userTwoId = new ObjectID();
+const userThreeId = new ObjectID();
+const profileOneId = new ObjectID();
+const profileTwoId = new ObjectID();
 const avatar = gravatar.url(this.email, {
   s: "200", //Size
   r: "pg", //Rating
@@ -28,6 +30,13 @@ const users = [
     email: "techguyinfo@gmail.com",
     password: "userTwoPass",
     avatar
+  },
+  {
+    _id: userThreeId,
+    name: "John Doe",
+    email: "johnD@gmail.com",
+    password: "userThreePass",
+    avatar
   }
 ];
 
@@ -40,6 +49,15 @@ const profiles = [
     skills: ["HTML", "CSS", "JavaScript", "React.js", "Node.js"],
     company: "Tactic Apps",
     website: "https://www.tacticapps.com"
+  },
+  {
+    _id: profileTwoId,
+    user: userTwoId,
+    handle: "BradT",
+    status: "Developer and Trainer",
+    skills: ["HTML", "CSS", "JavaScript", "PHP"],
+    company: "Traversy Media",
+    website: "https://www.traversymedia.com"
   }
 ];
 
@@ -67,8 +85,9 @@ const populateProfiles = done => {
   Profile.deleteMany({})
     .then(() => {
       let userOneProfile = new Profile(profiles[0]).save();
+      let userTwoProfile = new Profile(profiles[1]).save();
 
-      return Promise.all([userOneProfile]);
+      return Promise.all([userOneProfile, userTwoProfile]);
     })
     .then(() => done());
 };
