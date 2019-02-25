@@ -151,9 +151,10 @@ router.post("/forgetpw", (req, res) => {
     const subject = "Password reset link - example.com";
     const message = `Please <a href="https://test.com/resetpw/?${token}">click here</a> to reset your password`;
 
-    sendEmail(user.name, user.email, subject, message).catch(err =>
-      res.status(400).json({ error: "Email service down" })
-    );
+    sendEmail(user.name, user.email, subject, message).catch(err => {
+      errors.emailService = "Email service down";
+      return res.status(400).json(errors);
+    });
     return res.status(200).json({ result: "Email sent" });
   });
 });
@@ -194,8 +195,8 @@ router.patch(
         if (user) {
           return res.status(200).json({ success: true });
         }
-
-        return res.status(400).json({ success: false });
+        errors.success = false;
+        return res.status(400).json(errors);
       });
     });
   }

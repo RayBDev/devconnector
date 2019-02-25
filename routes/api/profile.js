@@ -27,11 +27,73 @@ router.get(
           errors.noprofile = "There is no profile for this user";
           return res.status(404).json(errors);
         }
-        res.json(profile);
+        return res.json(profile);
       })
       .catch(err => res.status(404).json(err));
   }
 );
+
+// @route   GET api/profile/all
+// @desc    Get all profiles
+// @access  Public
+router.get("/all", (req, res) => {
+  const errors = {};
+
+  Profile.find()
+    .populate("user", ["name", "avatar"])
+    .then(profiles => {
+      if (!profiles) {
+        errors.noprofiles = "There are no profiles available";
+        return res.status(404).json(errors);
+      }
+      return res.json(profiles);
+    })
+    .catch(err => {
+      errors.noprofiles = "There are no profiles";
+      return res.status(404).json(errors);
+    });
+});
+
+// @route   GET api/profile/handle/:handle
+// @desc    Get profile by handle
+// @access  Public
+router.get("/handle/:handle", (req, res) => {
+  const errors = {};
+
+  Profile.findOne({ handle: req.params.handle })
+    .populate("user", ["name", "avatar"])
+    .then(profile => {
+      if (!profile) {
+        errors.noprofile = "There is no profile for this user";
+        return res.status(404).json(errors);
+      }
+
+      return res.json(profile);
+    })
+    .catch(err => res.status(404).json(err));
+});
+
+// @route   GET api/profile/user/:user_id
+// @desc    Get profile by user ID
+// @access  Public
+router.get("/user/:user_id", (req, res) => {
+  const errors = {};
+
+  Profile.findOne({ user: req.params.user_id })
+    .populate("user", ["name", "avatar"])
+    .then(profile => {
+      if (!profile) {
+        errors.noprofile = "There is no profile for this user";
+        return res.status(404).json(errors);
+      }
+
+      return res.json(profile);
+    })
+    .catch(err => {
+      errors.noprofile = "There is no profile for this user";
+      return res.status(404).json(errors);
+    });
+});
 
 // @route   POST api/profile
 // @desc    Create or Edit user profile

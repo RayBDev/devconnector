@@ -267,7 +267,7 @@ describe("TEST ALL USER ROUTES", () => {
 });
 
 // Test the Profile Routes
-describe("TEST ALL PROFILE ROUTES", () => {
+describe("TEST PROFILE ROUTES", () => {
   describe("GET /api/profile", () => {
     it("should receive 404 if authorized user has no profile", done => {
       let token =
@@ -300,6 +300,95 @@ describe("TEST ALL PROFILE ROUTES", () => {
         .expect(res => {
           expect(res.body).toBeTruthy();
           expect(res.body.noprofile).toBeFalsy();
+        })
+        .end(done);
+    });
+  });
+
+  describe("GET /api/profile/all", () => {
+    it("should return all profiles in database with injected user name and avatar", done => {
+      let userInjectedProfiles = profiles.map((profile, index) => {
+        let injectProfile = {
+          ...profile,
+          _id: profiles[index]._id.toString(),
+          user: {
+            _id: users[index]._id.toString(),
+            name: users[index].name,
+            avatar: users[index].avatar
+          }
+        };
+        return injectProfile;
+      });
+
+      request(app)
+        .get("/api/profile/all")
+        .expect(200)
+        .expect(res => {
+          expect(res.body).toMatchObject(userInjectedProfiles);
+        })
+        .end(done);
+    });
+  });
+
+  describe("GET /api/profile/handle/:handle", () => {
+    it("should return user profile by handle with injected user name and avatar", done => {
+      let userInjectedProfile = {
+        ...profiles[0],
+        _id: profiles[0]._id.toString(),
+        user: {
+          _id: users[0]._id.toString(),
+          name: users[0].name,
+          avatar: users[0].avatar
+        }
+      };
+
+      request(app)
+        .get(`/api/profile/handle/${profiles[0].handle}`)
+        .expect(200)
+        .expect(res => {
+          expect(res.body).toMatchObject(userInjectedProfile);
+        })
+        .end(done);
+    });
+
+    it("should return 404 with unknown handle", done => {
+      request(app)
+        .get(`/api/profile/handle/unknownHandle`)
+        .expect(404)
+        .expect(res => {
+          expect(res.body.noprofile).toBe("There is no profile for this user");
+        })
+        .end(done);
+    });
+  });
+
+  describe("GET /api/profile/user/:user_id", () => {
+    it("should return user profile by user_id with injected user name and avatar", done => {
+      let userInjectedProfile = {
+        ...profiles[0],
+        _id: profiles[0]._id.toString(),
+        user: {
+          _id: users[0]._id.toString(),
+          name: users[0].name,
+          avatar: users[0].avatar
+        }
+      };
+
+      request(app)
+        .get(`/api/profile/user/${users[0]._id.toString()}`)
+        .expect(200)
+        .expect(res => {
+          expect(res.body).toMatchObject(userInjectedProfile);
+        })
+        .end(done);
+    });
+
+    it("should return 404 with invalid user_id", done => {
+      request(app)
+        .get(`/api/profile/user/${users[0]._id.toString() + 1}`)
+        .expect(404)
+        .expect(res => {
+          expect(res.body.noprofile).toBe("There is no profile for this user");
         })
         .end(done);
     });
