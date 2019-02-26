@@ -518,4 +518,115 @@ describe("TEST PROFILE ROUTES", () => {
         .end(done);
     });
   });
+
+  describe("GET /api/profile/experience", () => {
+    it("should add experience to a user's profile", done => {
+      let title = "Senior Developer";
+      let company = "Dev Studio";
+      let location = "Calgary, AB";
+      let from = "2010-02-08";
+      let to = "2012-09-08";
+      let description = "Worked on the full LAMP stack.";
+
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post("/api/profile/experience")
+        .set("Authorization", token)
+        .send({ title, company, location, from, to, description })
+        .expect(200)
+        .expect(res => {
+          expect(res.body.experience[0]).toMatchObject({
+            title,
+            company,
+            location,
+            description
+          });
+        })
+        .end(done);
+    });
+
+    it("should not add experience to a user's profile with missing fields", done => {
+      let title = "";
+      let company = "";
+      let from = "";
+
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post("/api/profile/experience")
+        .set("Authorization", token)
+        .send({ title, company, from })
+        .expect(400)
+        .expect(res => {
+          expect(res.body.title).toBe("Job title field is required");
+          expect(res.body.company).toBe("Company field is required");
+          expect(res.body.from).toBe("From date field is required");
+        })
+        .end(done);
+    });
+  });
+
+  describe("GET /api/profile/education", () => {
+    it("should add education to a user's profile", done => {
+      let school = "Udemy";
+      let degree = "Full Stack Web Developer Diploma";
+      let fieldofstudy = "Full Stack Web Development";
+      let from = "2010-02-08";
+      let to = "2012-09-08";
+      let description = "Worked on the full LAMP stack.";
+
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post("/api/profile/education")
+        .set("Authorization", token)
+        .send({ school, degree, fieldofstudy, from, to, description })
+        .expect(200)
+        .expect(res => {
+          expect(res.body.education[0]).toMatchObject({
+            school,
+            degree,
+            fieldofstudy,
+            description
+          });
+        })
+        .end(done);
+    });
+
+    it("should not add education to a user's profile with missing fields", done => {
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post("/api/profile/education")
+        .set("Authorization", token)
+        .send({})
+        .expect(400)
+        .expect(res => {
+          expect(res.body.school).toBe("School title field is required");
+          expect(res.body.degree).toBe("Degree field is required");
+          expect(res.body.fieldofstudy).toBe(
+            "Field of study field is required"
+          );
+          expect(res.body.from).toBe("From date field is required");
+        })
+        .end(done);
+    });
+  });
 });
