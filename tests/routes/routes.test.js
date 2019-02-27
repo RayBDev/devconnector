@@ -679,3 +679,67 @@ describe("TEST PROFILE ROUTES", () => {
     });
   });
 });
+
+// Test the Posts Route
+describe("TEST POSTS ROUTES", () => {
+  describe("GET /api/posts", () => {
+    it("should create a new post", done => {
+      let text = "This is my first post";
+      let user = users[0]._id.toString();
+
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post("/api/posts")
+        .set("Authorization", token)
+        .send({ text, user })
+        .expect(200)
+        .expect(res => {
+          expect(res.body).toMatchObject({ text, user });
+        })
+        .end(done);
+    });
+
+    it("should not create a new post if text field is not between 10-300 chars", done => {
+      let text = "Test";
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[2]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post("/api/posts")
+        .set("Authorization", token)
+        .send({ text })
+        .expect(400)
+        .expect(res => {
+          expect(res.body).toMatchObject({
+            text: "Post must be between 10 and 300 characters"
+          });
+        })
+        .end(done);
+    });
+
+    it("should not create a new post if text field is missing", done => {
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[2]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post("/api/posts")
+        .set("Authorization", token)
+        .expect(400)
+        .expect(res => {
+          expect(res.body).toMatchObject({ text: "Text field is required" });
+        })
+        .end(done);
+    });
+  });
+});
