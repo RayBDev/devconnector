@@ -10,6 +10,10 @@ const userTwoId = new ObjectID();
 const userThreeId = new ObjectID();
 const profileOneId = new ObjectID();
 const profileTwoId = new ObjectID();
+const experienceOneId = new ObjectID();
+const experienceTwoId = new ObjectID();
+const educationOneId = new ObjectID();
+const educationTwoId = new ObjectID();
 const avatar = gravatar.url(this.email, {
   s: "200", //Size
   r: "pg", //Rating
@@ -48,7 +52,27 @@ const profiles = [
     status: "Full Stack Developer",
     skills: ["HTML", "CSS", "JavaScript", "React.js", "Node.js"],
     company: "Tactic Apps",
-    website: "https://www.tacticapps.com"
+    website: "https://www.tacticapps.com",
+    experience: [
+      {
+        _id: experienceOneId.toString(),
+        title: "Full Stack Developer",
+        company: "Tactic Apps",
+        from: "2018-08-09T00:00:00.000Z",
+        description: "CEO and Lead web developer"
+      }
+    ],
+    education: [
+      {
+        _id: educationOneId.toString(),
+        school: "University of Calgary",
+        degree: "None",
+        fieldofstudy: "Computer Engineering",
+        from: "2003-01-05T00:00:00.000Z",
+        to: "2004-05-10T00:00:00.000Z",
+        description: "UofC Computer Engineering 1st year"
+      }
+    ]
   },
   {
     _id: profileTwoId,
@@ -57,7 +81,27 @@ const profiles = [
     status: "Developer and Trainer",
     skills: ["HTML", "CSS", "JavaScript", "PHP"],
     company: "Traversy Media",
-    website: "https://www.traversymedia.com"
+    website: "https://www.traversymedia.com",
+    experience: [
+      {
+        _id: experienceTwoId.toString(),
+        title: "Developer",
+        company: "TechGuy Solutions",
+        from: "2010-08-09T00:00:00.000Z",
+        description: "Lead web developer"
+      }
+    ],
+    education: [
+      {
+        _id: educationTwoId.toString(),
+        school: "University of Essex",
+        degree: "Associates",
+        fieldofstudy: "Computer Science",
+        from: "2008-01-05T00:00:00.000Z",
+        to: "2010-05-10T00:00:00.000Z",
+        description: "Basic computer science diploma"
+      }
+    ]
   }
 ];
 

@@ -7,6 +7,7 @@ const app = require("../../server");
 
 //Import Models
 const User = require("../../models/User");
+const Profile = require("../../models/Profile");
 
 //Import Seed Data
 const {
@@ -627,6 +628,54 @@ describe("TEST PROFILE ROUTES", () => {
           expect(res.body.from).toBe("From date field is required");
         })
         .end(done);
+    });
+  });
+
+  describe("DELETE api/profile/experience/:exp_id", () => {
+    it("should delete a user's experience by id", done => {
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .delete(`/api/profile/experience/${profiles[0].experience[0]._id}`)
+        .set("Authorization", token)
+        .expect(200)
+        .end(err => {
+          Profile.findOne({ user: users[0]._id }).then(profile => {
+            const removedIndex = profile.experience
+              .map(item => item.id)
+              .indexOf(profiles[0].experience[0]._id);
+            expect(removedIndex).toBe(-1);
+            done();
+          });
+        });
+    });
+  });
+
+  describe("DELETE api/profile/education/:edu_id", () => {
+    it("should delete a user's education by id", done => {
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .delete(`/api/profile/education/${profiles[0].education[0]._id}`)
+        .set("Authorization", token)
+        .expect(200)
+        .end(err => {
+          Profile.findOne({ user: users[0]._id }).then(profile => {
+            const removedIndex = profile.education
+              .map(item => item.id)
+              .indexOf(profiles[0].education[0]._id);
+            expect(removedIndex).toBe(-1);
+            done();
+          });
+        });
     });
   });
 });
