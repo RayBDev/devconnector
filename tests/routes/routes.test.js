@@ -8,18 +8,22 @@ const app = require("../../server");
 //Import Models
 const User = require("../../models/User");
 const Profile = require("../../models/Profile");
+const Post = require("../../models/Post");
 
 //Import Seed Data
 const {
   users,
   populateUsers,
   profiles,
-  populateProfiles
+  populateProfiles,
+  posts,
+  populatePosts
 } = require("./seed/seed");
 
 // Add seed data to database before testing
 beforeEach(populateUsers);
 beforeEach(populateProfiles);
+beforeEach(populatePosts);
 
 // Test the User routes
 describe("TEST ALL USER ROUTES", () => {
@@ -682,7 +686,7 @@ describe("TEST PROFILE ROUTES", () => {
 
 // Test the Posts Route
 describe("TEST POSTS ROUTES", () => {
-  describe("GET /api/posts", () => {
+  describe("POST /api/posts", () => {
     it("should create a new post", done => {
       let text = "This is my first post";
       let user = users[0]._id.toString();
@@ -738,6 +742,261 @@ describe("TEST POSTS ROUTES", () => {
         .expect(400)
         .expect(res => {
           expect(res.body).toMatchObject({ text: "Text field is required" });
+        })
+        .end(done);
+    });
+  });
+
+  describe("GET /api/posts", () => {
+    it("should get all posts", done => {
+      let userInjectedPosts = posts.map((post, index) => {
+        let injectPost = {
+          ...post,
+          _id: post._id.toString(),
+          user: post.user.toString(),
+          likes: [
+            {
+              ...post.likes[0],
+              _id: post.likes[0]._id.toString(),
+              user: post.likes[0].user.toString()
+            }
+          ]
+        };
+        return injectPost;
+      });
+
+      userInjectedPosts.sort((a, b) => {
+        if (a.date < b.date) {
+          return 1;
+        }
+        if (a.date > b.date) {
+          return -1;
+        }
+        return 0;
+      });
+
+      request(app)
+        .get("/api/posts")
+        .expect(200)
+        .expect(res => {
+          expect(res.body).toMatchObject(userInjectedPosts);
+        })
+        .end(done);
+    });
+  });
+
+  describe("GET /api/posts/:_id", () => {
+    it("should get post based on id", done => {
+      let firstPost = {
+        ...posts[0],
+        _id: posts[0]._id.toString(),
+        user: posts[0].user.toString(),
+        likes: [
+          {
+            ...posts[0].likes[0],
+            _id: posts[0].likes[0]._id.toString(),
+            user: posts[0].likes[0].user.toString()
+          }
+        ]
+      };
+
+      request(app)
+        .get(`/api/posts/${posts[0]._id.toString()}`)
+        .expect(200)
+        .expect(res => {
+          expect(res.body).toMatchObject(firstPost);
+        })
+        .end(done);
+    });
+
+    it("should 404 if id is invalid", done => {
+      request(app)
+        .get(`/api/posts/${posts[0]._id.toString() + 1}`)
+        .expect(404)
+        .expect(res => {
+          expect(res.body.nopostfound).toBe("No post found with that ID");
+        })
+        .end(done);
+    });
+  });
+
+  describe("DELETE /api/posts/:_id", () => {
+    it("should delete post based on id if post belongs to logged in user", done => {
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .delete(`/api/posts/${posts[0]._id.toString()}`)
+        .set("Authorization", token)
+        .expect(200)
+        .expect(res => {
+          expect(res.body.success).toBe(true);
+        })
+        .end(done);
+    });
+
+    it("should not delete post of another user and throw 401", done => {
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[1]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .delete(`/api/posts/${posts[0]._id.toString()}`)
+        .set("Authorization", token)
+        .expect(401)
+        .expect(res => {
+          expect(res.body.notauthorized).toBe("User not authorized");
+        })
+        .end(done);
+    });
+
+    it("should provide 404 status if post does not exist", done => {
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .delete(`/api/posts/${posts[0]._id.toString() + 1}`)
+        .set("Authorization", token)
+        .expect(404)
+        .expect(res => {
+          expect(res.body.postnotfound).toBe("No post found");
+        })
+        .end(done);
+    });
+  });
+
+  describe("POST /api/posts/like/:_id", () => {
+    it("should like a post based on the post id", done => {
+      let likedPost = {
+        ...posts[0],
+        _id: posts[0]._id.toString(),
+        user: posts[0].user.toString(),
+        likes: [
+          {
+            user: users[0]._id.toString()
+          },
+          {
+            ...posts[0].likes[0],
+            _id: posts[0].likes[0]._id.toString(),
+            user: posts[0].likes[0].user.toString()
+          }
+        ]
+      };
+
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post(`/api/posts/like/${posts[0]._id.toString()}`)
+        .set("Authorization", token)
+        .expect(200)
+        .expect(res => {
+          expect(res.body).toMatchObject(likedPost);
+        })
+        .end(done);
+    });
+
+    it("should not like a post if user already liked the post", done => {
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post(`/api/posts/like/${posts[1]._id.toString()}`)
+        .set("Authorization", token)
+        .expect(400)
+        .expect(res => {
+          expect(res.body.alreadyliked).toBe("User already liked this post");
+        })
+        .end(done);
+    });
+
+    it("should 404 status if post doesn't exist", done => {
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post(`/api/posts/like/${posts[0]._id.toString() + 1}`)
+        .set("Authorization", token)
+        .expect(404)
+        .expect(res => {
+          expect(res.body.postnotfound).toBe("No post found");
+        })
+        .end(done);
+    });
+  });
+
+  describe("POST /api/posts/unlike/:_id", () => {
+    it("should unlike a post based on the post id", done => {
+      let unlikedPost = {
+        ...posts[0],
+        _id: posts[0]._id.toString(),
+        user: posts[0].user.toString(),
+        likes: []
+      };
+
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[1]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post(`/api/posts/unlike/${posts[0]._id.toString()}`)
+        .set("Authorization", token)
+        .expect(200)
+        .expect(res => {
+          expect(res.body).toMatchObject(unlikedPost);
+        })
+        .end(done);
+    });
+
+    it("should not unlike a post if user hasn't liked the post", done => {
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[1]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post(`/api/posts/unlike/${posts[1]._id.toString()}`)
+        .set("Authorization", token)
+        .expect(400)
+        .expect(res => {
+          expect(res.body.notliked).toBe("You have not yet liked this post");
+        })
+        .end(done);
+    });
+
+    it("should 404 status if post doesn't exist", done => {
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[1]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post(`/api/posts/like/${posts[0]._id.toString() + 1}`)
+        .set("Authorization", token)
+        .expect(404)
+        .expect(res => {
+          expect(res.body.postnotfound).toBe("No post found");
         })
         .end(done);
     });

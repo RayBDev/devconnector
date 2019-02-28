@@ -2,9 +2,12 @@ const { ObjectID } = require("mongodb");
 const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
 
+// Import models
 const User = require("../../../models/User");
 const Profile = require("../../../models/Profile");
+const Post = require("../../../models/Post");
 
+// Create User IDs
 const userOneId = new ObjectID();
 const userTwoId = new ObjectID();
 const userThreeId = new ObjectID();
@@ -14,12 +17,21 @@ const experienceOneId = new ObjectID();
 const experienceTwoId = new ObjectID();
 const educationOneId = new ObjectID();
 const educationTwoId = new ObjectID();
+const postOneId = new ObjectID();
+const postTwoId = new ObjectID();
+const likesOneId = new ObjectID();
+const likesTwoId = new ObjectID();
+const commentsOneId = new ObjectID();
+const commentsTwoId = new ObjectID();
+
+// Create Gravatar URL
 const avatar = gravatar.url(this.email, {
   s: "200", //Size
   r: "pg", //Rating
   d: "mm" //Default
 });
 
+// Create user data
 const users = [
   {
     _id: userOneId,
@@ -44,6 +56,7 @@ const users = [
   }
 ];
 
+// Create profile data
 const profiles = [
   {
     _id: profileOneId,
@@ -105,6 +118,37 @@ const profiles = [
   }
 ];
 
+// Create post data
+const posts = [
+  {
+    _id: postOneId,
+    user: userOneId,
+    text: "This is Ray's first post",
+    date: "2019-02-27T18:55:28.655Z",
+    likes: [
+      {
+        _id: likesTwoId,
+        user: userTwoId
+      }
+    ],
+    comments: []
+  },
+  {
+    _id: postTwoId,
+    user: userTwoId,
+    text: "This is Brad's first post",
+    date: "2019-02-28T18:55:28.655Z",
+    likes: [
+      {
+        _id: likesOneId,
+        user: userOneId
+      }
+    ],
+    comments: []
+  }
+];
+
+// Populate Database with user data
 const populateUsers = done => {
   User.deleteMany({})
     .then(() => {
@@ -125,6 +169,7 @@ const populateUsers = done => {
     .then(() => done());
 };
 
+// Populate Database with profile data
 const populateProfiles = done => {
   Profile.deleteMany({})
     .then(() => {
@@ -136,4 +181,23 @@ const populateProfiles = done => {
     .then(() => done());
 };
 
-module.exports = { users, populateUsers, profiles, populateProfiles };
+// Populate Database with post data
+const populatePosts = done => {
+  Post.deleteMany({})
+    .then(() => {
+      let userOnePost = new Post(posts[0]).save();
+      let userTwoPost = new Post(posts[1]).save();
+
+      return Promise.all([userOnePost, userTwoPost]);
+    })
+    .then(() => done());
+};
+
+module.exports = {
+  users,
+  populateUsers,
+  profiles,
+  populateProfiles,
+  posts,
+  populatePosts
+};
