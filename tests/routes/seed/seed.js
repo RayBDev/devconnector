@@ -131,7 +131,14 @@ const posts = [
         user: userTwoId
       }
     ],
-    comments: []
+    comments: [
+      {
+        _id: commentsOneId,
+        text: "First comment on Ray's post",
+        user: userTwoId,
+        date: "2019-02-28T22:22:22.690Z"
+      }
+    ]
   },
   {
     _id: postTwoId,
@@ -144,7 +151,14 @@ const posts = [
         user: userOneId
       }
     ],
-    comments: []
+    comments: [
+      {
+        _id: commentsTwoId,
+        text: "First comment on Brad's post",
+        user: userOneId,
+        date: "2019-02-28T22:22:22.690Z"
+      }
+    ]
   }
 ];
 

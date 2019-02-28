@@ -195,7 +195,8 @@ router.delete(
         // Check if comment exists
         if (
           post.comments.filter(
-            comment => comment._id.toString() === req.params.comment_id
+            comment =>
+              comment._id.toString() === req.params.comment_id.toString()
           ).length === 0
         ) {
           return res

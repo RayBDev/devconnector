@@ -760,6 +760,13 @@ describe("TEST POSTS ROUTES", () => {
               _id: post.likes[0]._id.toString(),
               user: post.likes[0].user.toString()
             }
+          ],
+          comments: [
+            {
+              ...post.comments[0],
+              _id: post.comments[0]._id.toString(),
+              user: post.comments[0].user.toString()
+            }
           ]
         };
         return injectPost;
@@ -796,6 +803,13 @@ describe("TEST POSTS ROUTES", () => {
             ...posts[0].likes[0],
             _id: posts[0].likes[0]._id.toString(),
             user: posts[0].likes[0].user.toString()
+          }
+        ],
+        comments: [
+          {
+            ...posts[0].comments[0],
+            _id: posts[0].comments[0]._id.toString(),
+            user: posts[0].comments[0].user.toString()
           }
         ]
       };
@@ -888,6 +902,13 @@ describe("TEST POSTS ROUTES", () => {
             _id: posts[0].likes[0]._id.toString(),
             user: posts[0].likes[0].user.toString()
           }
+        ],
+        comments: [
+          {
+            ...posts[0].comments[0],
+            _id: posts[0].comments[0]._id.toString(),
+            user: posts[0].comments[0].user.toString()
+          }
         ]
       };
 
@@ -948,7 +969,14 @@ describe("TEST POSTS ROUTES", () => {
         ...posts[0],
         _id: posts[0]._id.toString(),
         user: posts[0].user.toString(),
-        likes: []
+        likes: [],
+        comments: [
+          {
+            ...posts[0].comments[0],
+            _id: posts[0].comments[0]._id.toString(),
+            user: posts[0].comments[0].user.toString()
+          }
+        ]
       };
 
       let token =
@@ -993,6 +1021,169 @@ describe("TEST POSTS ROUTES", () => {
 
       request(app)
         .post(`/api/posts/like/${posts[0]._id.toString() + 1}`)
+        .set("Authorization", token)
+        .expect(404)
+        .expect(res => {
+          expect(res.body.postnotfound).toBe("No post found");
+        })
+        .end(done);
+    });
+  });
+
+  describe("POST /api/posts/comment/:_id", () => {
+    it("should create a comment on a post specified by id", done => {
+      let text = "Second comment on Ray's post";
+
+      let commentedPost = {
+        ...posts[0],
+        _id: posts[0]._id.toString(),
+        user: posts[0].user.toString(),
+        likes: [
+          {
+            ...posts[0].likes[0],
+            _id: posts[0].likes[0]._id.toString(),
+            user: posts[0].likes[0].user.toString()
+          }
+        ],
+        comments: [
+          {
+            text,
+            user: users[0]._id.toString()
+          },
+          {
+            ...posts[0].comments[0],
+            _id: posts[0].comments[0]._id.toString(),
+            user: posts[0].comments[0].user.toString()
+          }
+        ]
+      };
+
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post(`/api/posts/comment/${posts[0]._id.toString()}`)
+        .set("Authorization", token)
+        .send({ text })
+        .expect(200)
+        .expect(res => {
+          expect(res.body).toMatchObject(commentedPost);
+        })
+        .end(done);
+    });
+
+    it("should not create a comment on a post if length isn't between 30 and 300 chars", done => {
+      let text = "Test";
+
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post(`/api/posts/comment/${posts[0]._id.toString()}`)
+        .set("Authorization", token)
+        .send({ text })
+        .expect(400)
+        .expect(res => {
+          expect(res.body.text).toBe(
+            "Post must be between 10 and 300 characters"
+          );
+        })
+        .end(done);
+    });
+
+    it("should not create a comment if post isn't found", done => {
+      let text = "This is another test comment.";
+
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .post(`/api/posts/comment/${posts[0]._id.toString() + 1}`)
+        .set("Authorization", token)
+        .send({ text })
+        .expect(404)
+        .expect(res => {
+          expect(res.body.postnotfound).toBe("No post found");
+        })
+        .end(done);
+    });
+  });
+
+  describe("POST /api/posts/comment/:_id/:comment_id", () => {
+    it("should delete a comment on a post based on their ids", done => {
+      let deletedCommentPost = {
+        ...posts[0],
+        _id: posts[0]._id.toString(),
+        user: posts[0].user.toString(),
+        likes: [
+          {
+            ...posts[0].likes[0],
+            _id: posts[0].likes[0]._id.toString(),
+            user: posts[0].likes[0].user.toString()
+          }
+        ],
+        comments: []
+      };
+
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .delete(
+          `/api/posts/comment/${posts[0]._id.toString()}/${posts[0].comments[0]._id.toString()}`
+        )
+        .set("Authorization", token)
+        .expect(200)
+        .expect(res => {
+          expect(res.body).toMatchObject(deletedCommentPost);
+        })
+        .end(done);
+    });
+
+    it("should return a 404 if comment not found", done => {
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .delete(
+          `/api/posts/comment/${posts[0]._id.toString()}/${posts[0].comments[0]._id.toString() +
+            1}`
+        )
+        .set("Authorization", token)
+        .expect(404)
+        .expect(res => {
+          expect(res.body.commentnotexists).toBe("Comment does not exist");
+        })
+        .end(done);
+    });
+
+    it("should return a 404 if post not found", done => {
+      let token =
+        "Bearer " +
+        jwt.sign({ _id: users[0]._id }, process.env.JWT_SECRET, {
+          expiresIn: 600
+        });
+
+      request(app)
+        .delete(
+          `/api/posts/comment/${posts[0]._id.toString() +
+            1}/${posts[0].comments[0]._id.toString()}`
+        )
         .set("Authorization", token)
         .expect(404)
         .expect(res => {
