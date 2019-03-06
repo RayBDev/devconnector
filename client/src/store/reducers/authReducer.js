@@ -1,3 +1,5 @@
+import * as actionTypes from "../actions/types";
+
 const initialState = {
   isAuthenticated: false,
   user: {}
