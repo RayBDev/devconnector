@@ -17,6 +17,14 @@ export const registerUser = (userData, history) => dispatch => {
     );
 };
 
+// Set logged in user
+export const setCurrentUser = decoded => {
+  return {
+    type: actionTypes.SET_CURRENT_USER,
+    payload: decoded
+  };
+};
+
 // Login - Get User Token
 export const loginUser = userData => dispatch => {
   axios
@@ -39,12 +47,4 @@ export const loginUser = userData => dispatch => {
         payload: err.response.data
       })
     );
-};
-
-// Set logged in user
-export const setCurrentUser = decoded => {
-  return {
-    type: actionTypes.SET_CURRENT_USER,
-    payload: decoded
-  };
 };
