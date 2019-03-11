@@ -50,11 +50,46 @@ export const loginUser = userData => dispatch => {
 };
 
 // Log user out
-export const logoutUser = () => dispatch => {
+export const logoutUser = history => dispatch => {
   // Remove token from localStorage
   localStorage.removeItem("jwtToken");
   // Remove auth header for future requests
   setAuthToken(false);
   // Set current user to {} which will set isAuthenticated to false
   dispatch(setCurrentUser({}));
+  history.push("/");
+};
+
+// Get user email for password reset
+export const resetEmail = userEmail => dispatch => {
+  axios
+    .post("/api/users/forgetpw", userEmail)
+    .then(res =>
+      dispatch({
+        type: actionTypes.PASSWORD_RESET_EMAIL_SENT
+      })
+    )
+    .catch(err =>
+      dispatch({
+        type: actionTypes.GET_ERRORS,
+        payload: err.response.data
+      })
+    );
+};
+
+// Set new password
+export const setNewPassword = newPassword => dispatch => {
+  axios
+    .patch("/api/users/resetpw", newPassword)
+    .then(res =>
+      dispatch({
+        type: actionTypes.RESET_PASSWORD
+      })
+    )
+    .catch(err =>
+      dispatch({
+        type: actionTypes.GET_ERRORS,
+        payload: err.response.data
+      })
+    );
 };

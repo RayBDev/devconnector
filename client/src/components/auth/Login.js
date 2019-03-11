@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import classnames from "classnames";
 import { connect } from "react-redux";
@@ -10,6 +11,12 @@ class Login extends Component {
     password: "",
     errors: {}
   };
+
+  componentDidMount() {
+    if (this.props.auth.isAuthenticated) {
+      this.props.history.push("/dashboard");
+    }
+  }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.auth.isAuthenticated) {
@@ -78,6 +85,9 @@ class Login extends Component {
                   {errors.password && (
                     <div className="invalid-feedback">{errors.password}</div>
                   )}
+                </div>
+                <div className="form-group">
+                  <Link to="/forgetpw">Forget Password?</Link>
                 </div>
                 <input type="submit" className="btn btn-info btn-block mt-4" />
               </form>

@@ -135,28 +135,31 @@ router.post("/forgetpw", (req, res) => {
 
   const email = req.body.email;
 
-  User.findOne({ email }).then(user => {
-    // Check for user and return status 200 even if not found
-    if (!user) {
-      return res.status(200).send();
-    }
+  User.findOne({ email })
+    .then(user => {
+      // Check for user and return status 200 even if not found
+      if (!user) {
+        return res.status(200).send();
+      }
 
-    const payload = { _id: user._id }; // Create JWT Payload
+      const payload = { _id: user._id }; // Create JWT Payload
 
-    // Sign Token
-    const token = encodeURI(
-      "Bearer " + jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 600 })
-    );
+      // Sign Token
+      const token = encodeURI(
+        "Bearer " +
+          jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 600 })
+      );
 
-    const subject = "Password reset link - example.com";
-    const message = `Please <a href="https://test.com/resetpw/?${token}">click here</a> to reset your password`;
+      const subject = "Password reset link - example.com";
+      const message = `Please <a href="http://localhost:3000/resetpw/?reset=${token}">click here</a> to reset your password`;
 
-    sendEmail(user.name, user.email, subject, message).catch(err => {
-      errors.emailService = "Email service down";
-      return res.status(400).json(errors);
-    });
-    return res.status(200).json({ result: "Email sent" });
-  });
+      sendEmail(user.name, user.email, subject, message).catch(err => {
+        errors.emailService = "Email service down";
+        return res.status(400).json(errors);
+      });
+      return res.status(200).json({ result: "Email sent" });
+    })
+    .catch(err => res.status(400).json({ databaseDown: "Database is down." }));
 });
 
 // @route   PATCH api/users/resetpw

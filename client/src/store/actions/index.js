@@ -2,5 +2,7 @@ export {
   registerUser,
   loginUser,
   setCurrentUser,
-  logoutUser
+  logoutUser,
+  resetEmail,
+  setNewPassword
 } from "./authActions";

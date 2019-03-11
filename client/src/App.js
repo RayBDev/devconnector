@@ -12,6 +12,8 @@ import Footer from "./components/layout/Footer";
 import Landing from "./components/layout/Landing";
 import Register from "./components/auth/Register";
 import Login from "./components/auth/Login";
+import ForgetPassword from "./components/auth/ForgetPassword";
+import ResetPassword from "./components/auth/ResetPassword";
 
 import "./App.css";
 
@@ -23,6 +25,16 @@ if (localStorage.jwtToken) {
   const decoded = jwt_decode(localStorage.jwtToken);
   // Set user and isAuthenticated
   store.dispatch(actionCreators.setCurrentUser(decoded));
+
+  // Check for expired token
+  const currentTime = Date.now() / 1000;
+  if (decoded.exp < currentTime) {
+    // Logout user
+    store.dispatch(actionCreators.logoutUser());
+    // TODO: Clear current Profile
+    // Redirect to Login
+    window.location.href = "/login";
+  }
 }
 
 class App extends Component {
@@ -36,6 +48,8 @@ class App extends Component {
             <div className="container">
               <Route exact path="/register" component={Register} />
               <Route exact path="/login" component={Login} />
+              <Route exact path="/forgetpw" component={ForgetPassword} />
+              <Route path="/resetpw" component={ResetPassword} />
             </div>
             <Footer />
           </div>
