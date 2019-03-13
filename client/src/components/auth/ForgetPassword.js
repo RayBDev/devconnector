@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import classnames from "classnames";
 import { connect } from "react-redux";
 
 import * as actionCreators from "../../store/actions";
 import Aux from "../hoc/Aux/Aux";
+import TextFieldGroup from "../common/TextFieldGroup";
 
 class ForgetPassword extends Component {
   state = {
@@ -42,24 +42,18 @@ class ForgetPassword extends Component {
       form = (
         <Aux>
           <p className="lead text-center">
-            Enter your email address to reset your password
+            Enter your registered email address to reset your password
           </p>
           <form noValidate onSubmit={this.onSubmit}>
-            <div className="form-group">
-              <input
-                type="email"
-                className={classnames("form-control form-control-lg", {
-                  "is-invalid": errors.email
-                })}
-                placeholder="Email Address"
-                name="email"
-                value={this.state.email}
-                onChange={this.onChange}
-              />
-              {errors.email && (
-                <div className="invalid-feedback">{errors.email}</div>
-              )}
-            </div>
+            <TextFieldGroup
+              placeholder="Registered Email Address"
+              name="email"
+              type="email"
+              value={this.state.email}
+              onChange={this.onChange}
+              error={errors.email}
+            />
+
             <input type="submit" className="btn btn-info btn-block mt-4" />
           </form>
         </Aux>
@@ -67,7 +61,8 @@ class ForgetPassword extends Component {
     } else {
       form = (
         <p className="lead text-center text-success">
-          You will receive an email shortly if the account exists.
+          Please check your email for your account reset link. You will only
+          receive an email if the account exists.
         </p>
       );
     }

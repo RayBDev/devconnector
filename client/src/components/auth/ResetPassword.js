@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withRouter } from "react-router-dom";
-import classnames from "classnames";
 import { connect } from "react-redux";
 
 import * as actionCreators from "../../store/actions";
 import Aux from "../hoc/Aux/Aux";
 import setAuthToken from "../../utils/setAuthToken";
+import TextFieldGroup from "../common/TextFieldGroup";
 
 class ResetPassword extends Component {
   state = {
@@ -74,36 +74,24 @@ class ResetPassword extends Component {
         <Aux>
           <p className="lead text-center">Enter your new password</p>
           <form onSubmit={this.onSubmit}>
-            <div className="form-group">
-              <input
-                type="password"
-                className={classnames("form-control form-control-lg", {
-                  "is-invalid": errors.password
-                })}
-                placeholder="Password"
-                name="password"
-                value={this.state.password}
-                onChange={this.onChange}
-              />
-              {errors.password && (
-                <div className="invalid-feedback">{errors.password}</div>
-              )}
-            </div>
-            <div className="form-group">
-              <input
-                type="password"
-                className={classnames("form-control form-control-lg", {
-                  "is-invalid": errors.password2
-                })}
-                placeholder="Confirm Password"
-                name="password2"
-                value={this.state.password2}
-                onChange={this.onChange}
-              />
-              {errors.password2 && (
-                <div className="invalid-feedback">{errors.password2}</div>
-              )}
-            </div>
+            <TextFieldGroup
+              placeholder="New Password"
+              name="password"
+              type="password"
+              value={this.state.password}
+              onChange={this.onChange}
+              error={errors.password}
+            />
+
+            <TextFieldGroup
+              placeholder="Confirm New Password"
+              name="password2"
+              type="password"
+              value={this.state.password2}
+              onChange={this.onChange}
+              error={errors.password}
+            />
+
             <input type="submit" className="btn btn-info btn-block mt-4" />
           </form>
         </Aux>
