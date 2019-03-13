@@ -77,6 +77,19 @@ export const resetEmail = userEmail => dispatch => {
     );
 };
 
+// Check Password Reset Token Validity
+export const checkTokenValidity = () => dispatch => {
+  axios
+    .patch("/api/users/resetpw", {})
+    .then(res => null)
+    .catch(err =>
+      dispatch({
+        type: actionTypes.TOKEN_ERROR,
+        payload: err.response.data
+      })
+    );
+};
+
 // Set new password
 export const setNewPassword = newPassword => dispatch => {
   axios

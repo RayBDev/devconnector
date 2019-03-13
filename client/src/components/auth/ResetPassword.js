@@ -22,6 +22,7 @@ class ResetPassword extends Component {
     }
 
     setAuthToken(this.state.token);
+    this.props.checkTokenValidity();
   }
 
   componentWillMount() {
@@ -59,7 +60,16 @@ class ResetPassword extends Component {
     const { errors } = this.state;
 
     let form;
-    if (!this.props.pwReset.passwordReset) {
+    if (!this.props.pwReset.tokenIsValid) {
+      form = (
+        <Aux>
+          <p className="lead text-center text-danger">
+            Your password reset link has expired. Please reset your password
+            again.
+          </p>
+        </Aux>
+      );
+    } else if (!this.props.pwReset.passwordReset) {
       form = (
         <Aux>
           <p className="lead text-center">Enter your new password</p>
@@ -101,7 +111,7 @@ class ResetPassword extends Component {
     } else {
       form = (
         <Aux>
-          <p className="lead text-center">
+          <p className="lead text-center text-success">
             Your password has been reset successfully.
           </p>
         </Aux>
@@ -137,7 +147,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   setNewPassword: newPassword =>
-    dispatch(actionCreators.setNewPassword(newPassword))
+    dispatch(actionCreators.setNewPassword(newPassword)),
+  checkTokenValidity: () => dispatch(actionCreators.checkTokenValidity())
 });
 
 export default connect(

@@ -4,5 +4,6 @@ export {
   setCurrentUser,
   logoutUser,
   resetEmail,
-  setNewPassword
+  setNewPassword,
+  checkTokenValidity
 } from "./authActions";
