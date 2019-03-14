@@ -88,7 +88,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  logoutUser: history => dispatch(actionCreators.logoutUser(history)),
+  logoutUser: () => dispatch(actionCreators.logoutUser()),
   clearCurrentProfile: () => dispatch(actionCreators.clearCurrentProfile())
 });
 

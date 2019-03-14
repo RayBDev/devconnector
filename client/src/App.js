@@ -1,11 +1,13 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import jwt_decode from "jwt-decode";
 import { Provider } from "react-redux";
 
 import setAuthToken from "./utils/setAuthToken";
 import * as actionCreators from "./store/actions";
 import store from "./store/store";
+
+import PrivateRoute from "./components/common/PrivateRoute";
 
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
@@ -52,7 +54,9 @@ class App extends Component {
               <Route exact path="/login" component={Login} />
               <Route exact path="/forgetpw" component={ForgetPassword} />
               <Route path="/resetpw" component={ResetPassword} />
-              <Route exact path="/dashboard" component={Dashboard} />
+              <Switch>
+                <PrivateRoute exact path="/dashboard" component={Dashboard} />
+              </Switch>
             </div>
             <Footer />
           </div>
