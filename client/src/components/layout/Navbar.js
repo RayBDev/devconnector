@@ -8,6 +8,7 @@ import * as actionCreators from "../../store/actions";
 class Navbar extends Component {
   onLogoutClick = e => {
     e.preventDefault();
+    this.props.clearCurrentProfile();
     this.props.logoutUser(this.props.history);
   };
   render() {
@@ -87,7 +88,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  logoutUser: history => dispatch(actionCreators.logoutUser(history))
+  logoutUser: history => dispatch(actionCreators.logoutUser(history)),
+  clearCurrentProfile: () => dispatch(actionCreators.clearCurrentProfile())
 });
 
 export default connect(

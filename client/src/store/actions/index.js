@@ -7,3 +7,5 @@ export {
   setNewPassword,
   checkTokenValidity
 } from "./authActions";
+
+export { getCurrentProfile, clearCurrentProfile } from "./profileActions";
