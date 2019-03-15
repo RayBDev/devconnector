@@ -8,4 +8,8 @@ export {
   checkTokenValidity
 } from "./authActions";
 
-export { getCurrentProfile, clearCurrentProfile } from "./profileActions";
+export {
+  getCurrentProfile,
+  clearCurrentProfile,
+  createProfile
+} from "./profileActions";
