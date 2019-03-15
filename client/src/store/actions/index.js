@@ -11,5 +11,6 @@ export {
 export {
   getCurrentProfile,
   clearCurrentProfile,
-  createProfile
+  createProfile,
+  deleteAccount
 } from "./profileActions";
