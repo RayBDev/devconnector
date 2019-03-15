@@ -13,5 +13,6 @@ export {
   clearCurrentProfile,
   createProfile,
   deleteAccount,
-  addExperience
+  addExperience,
+  addEducation
 } from "./profileActions";
