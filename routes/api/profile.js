@@ -142,20 +142,22 @@ router.post(
     Profile.findOne({ user: req.user._id }).then(profile => {
       if (profile) {
         // Check if handle exists
-        Profile.findOne({ handle: profileFields.handle }).then(profile => {
-          // Do not update if handle exists
-          if (profile) {
-            errors.handle = "That handle already exists";
-            return res.status(400).json(errors);
-          } else {
-            // Update if handle doesn't exist
-            Profile.findOneAndUpdate(
-              { user: req.user._id },
-              { $set: profileFields },
-              { new: true }
-            ).then(profile => res.json(profile));
+        Profile.findOne({ handle: profileFields.handle }).then(
+          profileByHandle => {
+            // Do not update if handle exists
+            if (profileByHandle._id.toString() !== profile._id.toString()) {
+              errors.handle = "That handle already exists";
+              return res.status(400).json(errors);
+            } else {
+              // Update if handle doesn't exist
+              Profile.findOneAndUpdate(
+                { user: req.user._id },
+                { $set: profileFields },
+                { new: true }
+              ).then(profile => res.json(profile));
+            }
           }
-        });
+        );
       } else {
         // Create
 
