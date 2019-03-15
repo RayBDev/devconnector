@@ -3,6 +3,7 @@ import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
+import * as actionCreators from "../../store/actions";
 import TextFieldGroup from "../common/TextFieldGroup";
 import TextAreaFieldGroup from "../common/TextAreaFieldGroup";
 
@@ -19,6 +20,12 @@ class AddExperience extends Component {
     errors: {}
   };
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.errors) {
+      this.setState({ errors: nextProps.errors });
+    }
+  }
+
   onCheck = () => {
     this.setState({
       disabled: !this.state.disabled,
@@ -32,7 +39,18 @@ class AddExperience extends Component {
 
   onSubmit = e => {
     e.preventDefault();
-    console.log("submit");
+
+    const expData = {
+      company: this.state.company,
+      title: this.state.title,
+      location: this.state.location,
+      from: this.state.from,
+      to: this.state.to,
+      current: this.state.current,
+      description: this.state.description
+    };
+
+    this.props.addExperience(expData, this.props.history);
   };
 
   render() {
@@ -127,6 +145,7 @@ class AddExperience extends Component {
 }
 
 AddExperience.propTypes = {
+  addExperience: PropTypes.func.isRequired,
   profile: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
 };
@@ -136,4 +155,12 @@ const mapStateToProps = state => ({
   errors: state.errors
 });
 
-export default connect(mapStateToProps)(withRouter(AddExperience));
+const mapDispatchToProps = dispatch => ({
+  addExperience: (expData, history) =>
+    dispatch(actionCreators.addExperience(expData, history))
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(AddExperience));
