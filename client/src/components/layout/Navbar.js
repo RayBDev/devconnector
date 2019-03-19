@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
+
+import logo from "../../img/logo.png";
 import * as actionCreators from "../../store/actions";
 
 class Navbar extends Component {
@@ -59,9 +61,16 @@ class Navbar extends Component {
     return (
       <nav className="navbar navbar-expand-sm navbar-dark bg-dark mb-4">
         <div className="container">
-          <Link className="navbar-brand" to="/">
-            DevConnector
-          </Link>
+          <div className="branding">
+            <img
+              src={logo}
+              alt="DevConnector Logo"
+              style={{ width: "20px", marginRight: "10px" }}
+            />
+            <Link className="navbar-brand" to="/">
+              DevConnector
+            </Link>
+          </div>
           <button
             className="navbar-toggler"
             type="button"
