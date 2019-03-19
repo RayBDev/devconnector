@@ -20,3 +20,5 @@ export {
   getProfiles,
   getProfileByHandle
 } from "./profileActions";
+
+export { addPost } from "./postActions";
