@@ -78,7 +78,11 @@ class Login extends Component {
                 <div className="form-group">
                   <Link to="/forgetpw">Forget Password?</Link>
                 </div>
-                <input type="submit" className="btn btn-info btn-block mt-4" />
+                <input
+                  type="submit"
+                  value="Submit"
+                  className="btn btn-info btn-block mt-4"
+                />
               </form>
             </div>
           </div>
