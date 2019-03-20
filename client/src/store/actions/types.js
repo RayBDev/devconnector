@@ -1,5 +1,6 @@
 // Auth Reducer
 export const GET_ERRORS = "GET_ERRORS";
+export const CLEAR_ERRORS = "CLEAR_ERRORS";
 export const TOKEN_ERROR = "TOKEN_ERROR";
 export const SET_CURRENT_USER = "SET_CURRENT_USER";
 export const PASSWORD_RESET_EMAIL_SENT = "PASSWORD_RESET_EMAIL_SENT";
